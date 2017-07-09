@@ -68,7 +68,7 @@ public class MenuFragment extends Fragment {
             case -1: break;
             case MenuMap.PASSIVE_MONITORING_APP:
                 Intent i = new Intent(); //parent.getPackageManager().getLaunchIntentForPackage("com.test.openable");
-                i.setComponent(new ComponentName("com.test.openable","com.test.openable.MainActivity"));
+                i.setComponent(new ComponentName("hk.ust.aed.alzheimerpassivemonitoring","hk.ust.aed.alzheimerpassivemonitoring.MainActivity"));
                 parent.startActivityForResult(i, 1);//null pointer check in case package name was not found
                 break;
             default:

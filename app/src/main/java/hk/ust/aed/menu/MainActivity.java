@@ -1,8 +1,11 @@
 package hk.ust.aed.menu;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.FragmentManager;
 import android.app.LoaderManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -58,6 +61,16 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Start UploadScheduler if there is no alarm of it
+        Intent pendingService = new Intent(getApplicationContext(),UploadScheduler.class);
+        boolean alarmNotExist = (PendingIntent.getService(getApplicationContext(),0,pendingService,PendingIntent.FLAG_NO_CREATE) == null);
+        if (alarmNotExist) {
+            Log.e("MainActivity","No Alarm");
+            AlarmManager am = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            PendingIntent alarmIntent = PendingIntent.getService(this, 0, pendingService, 0);
+            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 30 * 1000, alarmIntent);
+        }
 
         startActivity(new Intent(MainActivity.this, Splash.class)); //Splash
 

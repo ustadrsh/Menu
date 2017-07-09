@@ -4,7 +4,12 @@
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+
     <uses-permission android:name="hk.ust.aed.alzheimerpassivemonitoring.ContentProvider_Permission"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
 
     <application
         android:allowBackup="true"
@@ -27,6 +32,14 @@
         <activity
             android:name=".Splash">
         </activity>
+
+        <receiver android:name=".BroadcastReceiverBoot">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".UploadScheduler"/>
     </application>
 
 </manifest>

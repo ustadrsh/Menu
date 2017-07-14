@@ -38,8 +38,7 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
         <activity
             android:name=".Login"
-            android:label="@string/title_activity_login"></activity>
-            android:name=".Splash">
+            android:label="@string/title_activity_login">
         </activity>
 
         <receiver android:name=".BroadcastReceiverBoot">

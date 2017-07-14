@@ -96,7 +96,6 @@ public class MenuFragment extends Fragment {
                 }
         }
     }
-}
 
     public void startPackageForResult(Intent i, String pkg, String cls, int requestCode){
         i.setComponent(new ComponentName(pkg, cls));

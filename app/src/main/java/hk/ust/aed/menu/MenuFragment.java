@@ -14,11 +14,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MenuFragment extends Fragment {
+
+    private final int PASSIVE_MONITORING_APP = 100;
 
     private MainActivity parent;
     private static hk.ust.aed.menu.MenuMap menuMap;
@@ -63,11 +64,10 @@ public class MenuFragment extends Fragment {
         MenuFragment menu = new MenuFragment();
         Bundle args = new Bundle();
         int newFragmentState = menuMap.getNewState(fragmentState, clickedIndex);
-        Intent i;
         switch(newFragmentState) {
             case -1: break;
             case MenuMap.MTT:
-                //startPackageForResult(new Intent(), "hk.ust.aed.mtt", "hk.ust.aed.mtt.MainActivity", MenuMap.MTT);
+                startPackageForResult(new Intent(), "hk.ust.aed.mtt", "hk.ust.aed.mtt.MainActivity", MenuMap.MTT);
                 break;
             case MenuMap.SWM:
                 startPackageForResult(new Intent(), "hk.ust.aed.swm", "hk.ust.aed.swm.AndroidLauncher", MenuMap.SWM);
@@ -96,6 +96,7 @@ public class MenuFragment extends Fragment {
                 }
         }
     }
+}
 
     public void startPackageForResult(Intent i, String pkg, String cls, int requestCode){
         i.setComponent(new ComponentName(pkg, cls));

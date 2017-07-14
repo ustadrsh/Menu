@@ -1,8 +1,6 @@
 package hk.ust.aed.menu;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -17,7 +15,6 @@ import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -44,19 +41,24 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         File dirPM = new File(filesDir,"/PassiveMon");
         if(!dirPM.exists()) dirPM.mkdir();
         directoryPM = dirPM.toString();
+        Log.e("UploadFirebase", "ONCREATE");
         Log.i("PMdatadirectory",directoryPM);
     }
 
 
     @Override
     protected Void doInBackground(Void... params) {
-        Log.e("UploadFirebase","doInBackground");
-
-        String[] dataPM = passiveMonGetData(context);
-        dataUploadPM(dataPM[0],dataPM[1],"user123456");
-
-
-
+        Log.e("Calling","doInBackground");
+        boolean PM = false;
+        if(PM) {
+            String[] dataPM = passiveMonGetData(context);
+            dataUploadPM(dataPM[0], dataPM[1], "user123456");
+        }
+        else{
+            String[] dataSWM = swmGetData(context);
+            Log.e("Retrieved JSON", dataSWM[0]);
+            //dataUploadSWM(dataPM[0], dataPM[1], "user123456");
+        }
         return null;
     }
 
@@ -64,6 +66,32 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String trialID = dateFormat.format(new Date(System.currentTimeMillis()));
         Uri uri = Uri.parse(context.getResources().getString(R.string.PM_URI) + trialID);
+        InputStream is = null;
+        StringBuilder result = new StringBuilder();
+        try {
+            is = context.getContentResolver().openInputStream(uri);
+            BufferedReader r = new BufferedReader(new InputStreamReader(is));
+            String line;
+            while ((line = r.readLine()) != null) {
+                result.append(line);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try { if (is != null) is.close(); } catch (IOException e) { }
+        }
+
+        Log.e("TestJson",result.toString());
+        String[] data = {result.toString(),trialID};
+        return data;
+    }
+
+    private String[] swmGetData(Context context){
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String trialID = "20170613";
+        Uri uri = Uri.parse(context.getResources().getString(R.string.SWM_URI) + trialID);
         InputStream is = null;
         StringBuilder result = new StringBuilder();
         try {
@@ -111,6 +139,28 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         Response response = null;
         Request request = new Request.Builder()
                 .url(FIREBASE_URL + userID + "/passiveMon/" + trialID + ".json")
+                .post(body)
+                .build();
+        try{
+            response = client.newCall(request).execute();
+        }
+        catch (IOException e){
+
+        }
+
+        if(response == null) return false;
+        if(!response.isSuccessful()) return false;
+        return true;
+    }
+
+    private boolean dataUploadSWM(String data, String trialID, String userID){
+        OkHttpClient client = new OkHttpClient();
+        final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        RequestBody body = RequestBody.create(JSON, data);
+        Response response = null;
+        Request request = new Request.Builder()
+                .url(FIREBASE_URL + userID + "/SWM/scores" + trialID + ".json")
                 .post(body)
                 .build();
         try{

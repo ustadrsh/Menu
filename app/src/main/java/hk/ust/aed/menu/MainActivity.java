@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Log.e("MainActivity","ONCREATE");
         //Start UploadScheduler if there is no alarm of it
         Intent pendingService = new Intent(getApplicationContext(),UploadScheduler.class);
         boolean alarmNotExist = (PendingIntent.getService(getApplicationContext(),0,pendingService,PendingIntent.FLAG_NO_CREATE) == null);
@@ -108,8 +108,9 @@ public class MainActivity extends AppCompatActivity
             PendingIntent alarmIntent = PendingIntent.getService(this, 0, pendingService, 0);
             am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 30 * 1000, alarmIntent);
         }
-
-        startActivity(new Intent(MainActivity.this, Splash.class)); //Splash
+        else{
+            Log.e("MainActivity", "ALARM");
+        }
 
         menuMap = new MenuMap();
 

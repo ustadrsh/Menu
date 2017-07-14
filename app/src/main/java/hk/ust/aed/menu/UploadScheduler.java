@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -27,14 +26,14 @@ public class UploadScheduler extends Service {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPreferences.edit();
         alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        Log.e("UploadScheduler","onCreate");
+        Log.e("UploadScheduler","ONCREATE");
         super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         new UploadFirebase(this).execute();
-        editor.putString("LastUpload",Long.toString(System.currentTimeMillis()));
+        //editor.putString("LastUpload",Long.toString(System.currentTimeMillis()));
 
         Intent nextUploadFirebase = new Intent(getApplicationContext(), this.getClass());
         PendingIntent pendingNextUploadFirebase= PendingIntent.getService(this, 0, intent, 0);

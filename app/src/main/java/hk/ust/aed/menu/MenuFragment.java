@@ -14,12 +14,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MenuFragment extends Fragment {
-
-    private final int PASSIVE_MONITORING_APP = 100;
 
     private MainActivity parent;
     private static hk.ust.aed.menu.MenuMap menuMap;
@@ -64,13 +63,31 @@ public class MenuFragment extends Fragment {
         MenuFragment menu = new MenuFragment();
         Bundle args = new Bundle();
         int newFragmentState = menuMap.getNewState(fragmentState, clickedIndex);
+        Intent i;
         switch(newFragmentState) {
             case -1: break;
-            case MenuMap.PASSIVE_MONITORING_APP:
-                Intent i = new Intent(); //parent.getPackageManager().getLaunchIntentForPackage("com.test.openable");
-                i.setComponent(new ComponentName("com.test.openable","com.test.openable.MainActivity"));
-                parent.startActivityForResult(i, 1);//null pointer check in case package name was not found
+            case MenuMap.MTT:
+                //startPackageForResult(new Intent(), "hk.ust.aed.mtt", "hk.ust.aed.mtt.MainActivity", MenuMap.MTT);
                 break;
+            case MenuMap.SWM:
+                startPackageForResult(new Intent(), "hk.ust.aed.swm", "hk.ust.aed.swm.AndroidLauncher", MenuMap.SWM);
+                break;
+            case MenuMap.SRM:
+                startPackageForResult(new Intent(), "hk.ust.aed.srm", "hk.ust.aed.srm.AndroidLauncher", MenuMap.SRM);
+                break;
+            case MenuMap.PASSIVE_MONITORING:
+                startPackageForResult(new Intent(), "com.test.openable", "com.test.openable.MainActivity", MenuMap.PASSIVE_MONITORING);
+                break;
+            case MenuMap.UNITY_GAME:
+                Intent launchIntent = new Intent();
+                launchIntent.putExtra("playerName", "test");
+                launchIntent.putExtra("id", "1");
+                launchIntent.putExtra("signDurationCalibrated", "0.10");
+                launchIntent.putExtra("roadSpeedCalibrated", "18.0");
+                launchIntent.putExtra("sensitivity", "200");
+                launchIntent.putExtra("coinCalibrationAccel", "3");
+                launchIntent.setFlags(0);
+                startPackageForResult(launchIntent, "com.hk.ust.aed.multitasking3d", "com.unity3d.player.UnityPlayerActivity", MenuMap.UNITY_GAME);
             default:
                 if(newFragmentState <= 3) {
                     args.putInt("state", newFragmentState);
@@ -78,5 +95,10 @@ public class MenuFragment extends Fragment {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame, menu).commit();
                 }
         }
+    }
+
+    public void startPackageForResult(Intent i, String pkg, String cls, int requestCode){
+        i.setComponent(new ComponentName(pkg, cls));
+        parent.startActivityForResult(i, requestCode);
     }
 }

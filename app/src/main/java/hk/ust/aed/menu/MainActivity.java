@@ -25,6 +25,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -36,24 +39,58 @@ public class MainActivity extends AppCompatActivity
     private String mSelectionClause = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " = ?";
     private String[] mSelectionArguments = new String[]{"Dad"};
     private String mOrderBy = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY;
-    private CursorLoader cursorLoader;
     private int myLoader = 1;
 
-    //ContentResolver
-    //URI of contentprovider
+    private List<Integer> coinPerformanceStringToList(String str) {
+        List<Integer> result = new ArrayList<Integer>();
+        int currInt = 1;
+        String[] strArray = str.split(",");
+        for (int i = 0; i < strArray.length; ++i) {
+            int leng = Integer.parseInt(strArray[i]);
+            for (int j = 0; j < leng; ++j) {
+                result.add(currInt);
+                //Log.d("TAG", "" + currInt);
+            }
+            if (currInt == 0) currInt = 1;
+            else currInt = 0;
+        }
+        return result;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("THIS SHIT WORKED YO", data.getStringExtra("result"));
-        Log.e("requestCode", Boolean.toString(requestCode == 1));
-        Log.e("requestCode", Integer.toString(resultCode));
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-
+        if(resultCode == Activity.RESULT_OK){
+            switch(requestCode){
+                case MenuMap.SWM:
+                    Log.e("SWM RETURNED", data.getStringExtra("result"));
+                    break;
+                case MenuMap.SRM:
+                    Log.e("SRM RETURNED", data.getStringExtra("result"));
+                    break;
+                case MenuMap.UNITY_GAME:
+                    Log.d("TAG", "OK");
+                    String signDurationCalibrated = data.getStringExtra("signDurationCalibrated");
+                    String roadSpeedCalibrated = data.getStringExtra("roadSpeedCalibrated");
+                    String sensitivity = data.getStringExtra("sensitivity");
+                    String signDurationAtTime = data.getStringExtra("signDurationAtTime");
+                    String signPerformanceTime = data.getStringExtra("signPerformanceTime");
+                    String signPerformance = data.getStringExtra("signPerformance");
+                    String coinPerformance = data.getStringExtra("coinPerformance");
+                    List<Integer> coinPerformaceList = coinPerformanceStringToList(coinPerformance);
+                    Log.d("TAG", signDurationCalibrated);
+                    Log.d("TAG", roadSpeedCalibrated);
+                    Log.d("TAG", sensitivity);
+                    Log.d("TAG", signDurationAtTime);
+                    Log.d("TAG", signPerformanceTime);
+                    Log.d("TAG", signPerformance);
+                    Log.d("TAG", coinPerformance);
+                    Log.d("TAG", "" + coinPerformaceList);
+                    Log.d("TAG", sensitivity);
+                    break;
             }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                //Write your code if there's no result
-            }
+        }
+        if (resultCode == Activity.RESULT_CANCELED) {
+            //Write your code if there's no result
         }
     }
 
@@ -201,5 +238,6 @@ public class MainActivity extends AppCompatActivity
     public void onLoaderReset(Loader loader) {
 
     }
+
     //END LOADER
 }

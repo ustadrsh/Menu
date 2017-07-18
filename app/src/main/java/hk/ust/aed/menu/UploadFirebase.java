@@ -52,12 +52,12 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         boolean PM = false;
         if(PM) {
             String[] dataPM = passiveMonGetData(context);
-            dataUploadPM(dataPM[0], dataPM[1], "user123456");
+            pmDataUpload(dataPM[0], dataPM[1], "user123456");
         }
         else{
-            String[] dataSWM = swmGetData(context);
-            Log.e("Retrieved JSON", dataSWM[0]);
-            //dataUploadSWM(dataPM[0], dataPM[1], "user123456");
+            String trialId = swmGetLatestTrialId();
+            String data = swmGetData(context, trialId);
+            swmDataUpload(data, trialId, "user123456");
         }
         return null;
     }
@@ -88,10 +88,13 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         return data;
     }
 
-    private String[] swmGetData(Context context){
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        String trialID = "20170613";
-        Uri uri = Uri.parse(context.getResources().getString(R.string.SWM_URI) + trialID);
+    public static String swmGetLatestTrialId(){
+        return "lol_latest_trial";
+    }
+
+    private String swmGetData(Context context, String trialId){
+        //DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        Uri uri = Uri.parse(context.getResources().getString(R.string.SWM_URI) + trialId);
         InputStream is = null;
         StringBuilder result = new StringBuilder();
         try {
@@ -110,8 +113,7 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         }
 
         Log.e("TestJson",result.toString());
-        String[] data = {result.toString(),trialID};
-        return data;
+        return result.toString();
     }
 
     //true if file store successfully
@@ -131,7 +133,7 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         return file.length()> 1;
     }
 
-    private boolean dataUploadPM(String data, String trialID, String userID){
+    private boolean pmDataUpload(String data, String trialID, String userID){
         OkHttpClient client = new OkHttpClient();
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -153,15 +155,17 @@ public class UploadFirebase extends AsyncTask<Void, Void, Void> {
         return true;
     }
 
-    private boolean dataUploadSWM(String data, String trialID, String userID){
+    private boolean swmDataUpload(String data, String trialId, String userId){
         OkHttpClient client = new OkHttpClient();
         final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+        Log.e(trialId, userId);
 
         RequestBody body = RequestBody.create(JSON, data);
         Response response = null;
         Request request = new Request.Builder()
-                .url(FIREBASE_URL + userID + "/SWM/scores" + trialID + ".json")
-                .post(body)
+                .url(FIREBASE_URL + userId + "/swm/scores/" + trialId + ".json")
+                .put(body)
                 .build();
         try{
             response = client.newCall(request).execute();

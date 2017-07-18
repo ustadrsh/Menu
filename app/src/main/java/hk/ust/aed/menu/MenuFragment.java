@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -64,22 +65,23 @@ public class MenuFragment extends Fragment {
         MenuFragment menu = new MenuFragment();
         Bundle args = new Bundle();
         int newFragmentState = menuMap.getNewState(fragmentState, clickedIndex);
-        switch(newFragmentState) {
+        Intent launchIntent = new Intent();
+        switch (newFragmentState) {
             case -1: break;
             case MenuMap.MTT:
-                startPackageForResult(new Intent(), "hk.ust.aed.mtt", "hk.ust.aed.mtt.MainActivity", MenuMap.MTT);
+                startPackageForResult(launchIntent, "hk.ust.aed.mtt", "hk.ust.aed.mtt.MainActivity", MenuMap.MTT);
                 break;
             case MenuMap.SWM:
-                startPackageForResult(new Intent(), "hk.ust.aed.swm", "hk.ust.aed.swm.AndroidLauncher", MenuMap.SWM);
+                DownloadApp d = new DownloadApp(parent.getApplicationContext(), this);
+                d.execute("https://www.dl.dropboxusercontent.com/s/ufktun87uvppimv/swm_hk.ust.aed.swm.apk?dl=0");
                 break;
             case MenuMap.SRM:
-                startPackageForResult(new Intent(), "hk.ust.aed.srm", "hk.ust.aed.srm.AndroidLauncher", MenuMap.SRM);
+                startPackageForResult(launchIntent, "hk.ust.aed.srm", "hk.ust.aed.srm.AndroidLauncher", MenuMap.SRM);
                 break;
             case MenuMap.PASSIVE_MONITORING:
-                startPackageForResult(new Intent(), "com.test.openable", "com.test.openable.MainActivity", MenuMap.PASSIVE_MONITORING);
+                startPackageForResult(launchIntent, "com.test.openable", "com.test.openable.MainActivity", MenuMap.PASSIVE_MONITORING);
                 break;
             case MenuMap.UNITY_GAME:
-                Intent launchIntent = new Intent();
                 launchIntent.putExtra("playerName", "test");
                 launchIntent.putExtra("id", "1");
                 launchIntent.putExtra("signDurationCalibrated", "0.10");

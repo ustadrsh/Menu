@@ -101,6 +101,7 @@ public class DownloadApp extends AsyncTask<String,Void,Void> {
         launchIntent.putExtra("trialDurationMillis", 20000);
         launchIntent.putExtra("numSets", 4);
         launchIntent.putExtra("numBoxes", 6);
+
         if(swmAlreadyInstalled) {
             parent.startPackageForResult(launchIntent, "hk.ust.aed.swm", "hk.ust.aed.swm.AndroidLauncher", MenuMap.SWM);
         }

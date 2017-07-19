@@ -15,6 +15,10 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -82,6 +86,16 @@ public class MenuFragment extends Fragment {
                 startPackageForResult(launchIntent, "com.test.openable", "com.test.openable.MainActivity", MenuMap.PASSIVE_MONITORING);
                 break;
             case MenuMap.UNITY_GAME:
+                File outFile = new File(getContext().getExternalFilesDir(null), "UNITY_PARAMS.json");
+                try {
+                    OutputStream os = new FileOutputStream(outFile.getAbsolutePath());
+                    os.write("{test: 3}".getBytes());
+                    os.flush();
+                    os.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                launchIntent.putExtra("fileLocation", outFile.getAbsoluteFile());
                 launchIntent.putExtra("playerName", "test");
                 launchIntent.putExtra("id", "1");
                 launchIntent.putExtra("signDurationCalibrated", "0.10");

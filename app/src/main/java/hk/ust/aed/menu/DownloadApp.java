@@ -21,13 +21,13 @@ import java.net.URL;
 public class DownloadApp extends AsyncTask<String,Void,Void> {
 
     private Context context;
+    private MainActivity parent;
     private File apk;
-    private MenuFragment parent;
     private boolean swmAlreadyInstalled = true;
 
-    public DownloadApp(Context context, MenuFragment parent){
-        this.context = context;
+    public DownloadApp(MainActivity parent){
         this.parent = parent;
+        this.context = parent.getApplicationContext();
     }
 
     @Override
@@ -103,7 +103,7 @@ public class DownloadApp extends AsyncTask<String,Void,Void> {
         launchIntent.putExtra("numBoxes", 6);
 
         if(swmAlreadyInstalled) {
-            parent.startPackageForResult(launchIntent, "hk.ust.aed.swm", "hk.ust.aed.swm.AndroidLauncher", MenuMap.SWM);
+            parent.getMenuMap().startPackageForResult(launchIntent, "hk.ust.aed.swm", "hk.ust.aed.swm.AndroidLauncher", MenuMap.SWM);
         }
         else {
             context.startActivity(launchIntent);

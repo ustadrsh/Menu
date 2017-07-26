@@ -1,9 +1,7 @@
 package hk.ust.aed.menu;
 
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -15,28 +13,26 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MenuFragment extends Fragment {
-
     private final int PASSIVE_MONITORING_APP = 100;
 
     private MainActivity parent;
     private static hk.ust.aed.menu.MenuMap menuMap;
     private ListAdapter la;
     private ListView lv;
+    private String[] menu;
     int fragmentState;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.menu, container, false);
-        la = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, menuMap.getCurrentMenu(fragmentState));
+        Bundle args = getArguments();
+        menu = args.getStringArray("menu");
+        la = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, menu);
         lv = (ListView) view.findViewById(R.id.list);
         lv.setAdapter(la);
         lv.setOnItemClickListener(
@@ -45,7 +41,7 @@ public class MenuFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         String clicked = String.valueOf(parent.getItemAtPosition(position));
                         Toast.makeText(getActivity(), clicked, Toast.LENGTH_LONG).show();
-                        newFragment(position);
+                        menuMap.newScreen(fragmentState, position);
                     }
                 }
         );
@@ -65,6 +61,7 @@ public class MenuFragment extends Fragment {
         }
     }
 
+    /*
     public void newFragment(int clickedIndex){
         MenuFragment menu = new MenuFragment();
         Bundle args = new Bundle();
@@ -111,10 +108,10 @@ public class MenuFragment extends Fragment {
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame, menu).commit();
                 }
         }
-    }
+    }*/
 
-    public void startPackageForResult(Intent i, String pkg, String cls, int requestCode){
+    /*public void startPackageForResult(Intent i, String pkg, String cls, int requestCode){
         i.setComponent(new ComponentName(pkg, cls));
         parent.startActivityForResult(i, requestCode);
-    }
+    }*/
 }

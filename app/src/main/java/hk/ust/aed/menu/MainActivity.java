@@ -101,7 +101,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
-        Log.e("MainActivity","ONCREATE");
         //Start UploadScheduler if there is no alarm of it
         Intent pendingService = new Intent(getApplicationContext(),UploadScheduler.class);
         boolean alarmNotExist = (PendingIntent.getService(getApplicationContext(),0,pendingService,PendingIntent.FLAG_NO_CREATE) == null);
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity
             Log.e("MainActivity", "ALARM");
         }
 
-        menuMap = new MenuMap();
+        menuMap = new MenuMap(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -137,7 +136,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        loadMenu(1);
+        loadMenu(0);
         navigationView.getMenu().getItem(0).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
     }
@@ -209,11 +208,12 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame, fragment, "fragment1");
         fragmentTransaction.commit();*/
-        MenuFragment menu = new MenuFragment();
+        menuMap.newScreen(0, desiredFragmentState);
+        /*MenuFragment menu = new MenuFragment();
         Bundle args = new Bundle();
         args.putInt("state", desiredFragmentState);
         menu.setArguments(args);
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame, menu).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame, menu).commit();*/
     }
 
     public MenuMap getMenuMap(){

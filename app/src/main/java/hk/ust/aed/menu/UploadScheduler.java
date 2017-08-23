@@ -32,7 +32,7 @@ public class UploadScheduler extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        new UploadFirebase(this).execute();
+        //new UploadFirebase(this).execute();
         //editor.putString("LastUpload",Long.toString(System.currentTimeMillis()));
 
         Intent nextUploadFirebase = new Intent(getApplicationContext(), this.getClass());

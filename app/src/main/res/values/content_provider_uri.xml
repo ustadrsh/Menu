@@ -2,4 +2,6 @@
 <resources>
     <string name="PM_URI">content://hk.ust.aed.alzheimerpassivemonitoring.PMContentProvider/</string>
     <string name="SWM_URI">content://hk.ust.aed.swm.SWMContentProvider/</string>
+    <string name="SRM_URI">content://hk.ust.aed.srm.SRMContentProvider/</string>
+    <string name="MTT_URI">content://hk.ust.aed.mtt.MTTContentProvider/</string>
 </resources>

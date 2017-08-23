@@ -8,7 +8,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,23 +15,27 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import hk.ust.aed.menu.ParseRequest;
+import hk.ust.aed.menu.DownloadFile;
 import hk.ust.aed.menu.R;
-import hk.ust.aed.menu.SendGetRequest;
 import hk.ust.aed.menu.models.SingleItemModel;
 
 public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListDataAdapter.SingleItemRowHolder> {
 
     private ArrayList<SingleItemModel> itemsList;
     private Context mContext;
-    Bitmap image;
+    FirebaseStorage storage;
+    StorageReference storageRef;
+
+
 
     public SectionListDataAdapter(Context context, ArrayList<SingleItemModel> itemsList) {
         this.itemsList = itemsList;
@@ -53,7 +56,7 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
 
         holder.tvTitle.setText(singleItem.getName());
 
-        File outFile = new File(mContext.getExternalFilesDir(null), "trump.png");
+        File outFile = new File(mContext.getExternalFilesDir(null), singleItem.getPictureName());
         updateAndSetHolderImage(holder, outFile);
 
        /* Glide.with(mContext)
@@ -91,8 +94,34 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
     }
 
     void updateAndSetHolderImage(final SingleItemRowHolder holder, final File outFile){
-        final boolean download = !outFile.exists() || (outFile.length() <= 0);
-        ParseRequest downloadAndSet = new ParseRequest() {
+        final boolean download = !outFile.exists();
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReferenceFromUrl("gs://ustadrsh-cf116.appspot.com").child(outFile.getName());
+
+        DownloadFile setImage = new DownloadFile() {
+            @Override
+            public void onDownloaded(File image) {
+                Bitmap bitmap = null;
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                try {
+                    bitmap = BitmapFactory.decodeStream(new FileInputStream(image), null, options);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                holder.itemImage.setImageBitmap(bitmap);
+            }
+        };
+
+        if(download){
+            Log.e("update and set", "downloading");
+            setImage.downloadFileAndAct(storageRef, outFile);
+        }
+        else {
+            setImage.onDownloaded(outFile);
+            Log.e("update and set", "filefound");
+        }
+        /*ParseRequest downloadAndSet = new ParseRequest() {
             @Override
             public void execute(String response) {
                 try {
@@ -169,5 +198,4 @@ public class SectionListDataAdapter extends RecyclerView.Adapter<SectionListData
 
         return bytes;
     }
-
 }

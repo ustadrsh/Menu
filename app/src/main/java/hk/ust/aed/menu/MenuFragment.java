@@ -17,14 +17,13 @@ import android.widget.Toast;
  * A simple {@link Fragment} subclass.
  */
 public class MenuFragment extends Fragment {
-    private final int PASSIVE_MONITORING_APP = 100;
 
     private MainActivity parent;
     private static hk.ust.aed.menu.MenuMap menuMap;
     private ListAdapter la;
     private ListView lv;
     private String[] menu;
-    int fragmentState;
+    private MenuMap.Screen fragmentState;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,13 +51,10 @@ public class MenuFragment extends Fragment {
     public void onAttach(Context context){
         super.onAttach(context);
         parent = (MainActivity) context;
-        Bundle args = getArguments();
-        fragmentState = args.getInt("state", 0);
         menuMap = parent.getMenuMap();
-        String menuTitle = menuMap.getMenuTitle(fragmentState);
-        if(menuTitle != null){
-            parent.setTitle(menuTitle);
-        }
+        Bundle args = getArguments();
+        fragmentState = MenuMap.Screen.valueOf(args.getString("state", MenuMap.Screen.NULL.name()));
+        parent.setTitle(menuMap.getTitle(fragmentState));
     }
 
     /*

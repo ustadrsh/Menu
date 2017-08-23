@@ -6,49 +6,37 @@ package hk.ust.aed.menu.models;
 public class SingleItemModel {
 
     private String name;
-    private String url;
-    private String description;
-    private int imageResource;
+    private String pictureName;
+    private int defaultImageResource;
 
-
-    public SingleItemModel() {
-    }
-
-    public SingleItemModel(String name, String url, int imageResource) {
+    public void setName(String name) {
         this.name = name;
-        this.url = url;
-        this.imageResource = imageResource;
     }
 
-    public String getUrl() {
-        return url;
+    public void setPictureName(String pictureName) {
+        this.pictureName = pictureName;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setDefaultImageResource(int defaultImageResource) {
+        this.defaultImageResource = defaultImageResource;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public String getPictureName() {
+        return pictureName;
+    }
+
+    public int getDefaultImageResource() {
+        return defaultImageResource;
+    }
+
+    public SingleItemModel(String name, String pictureName, int imageResource) {
         this.name = name;
-    }
+        this.pictureName = pictureName;
+        this.defaultImageResource = imageResource;
 
-    public int getImageResource(){
-        return this.imageResource;
-    }
-
-    public void setImageResource(int imageResource){
-        this.imageResource = imageResource;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

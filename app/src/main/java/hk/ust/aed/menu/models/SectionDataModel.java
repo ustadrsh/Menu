@@ -19,8 +19,6 @@ public class SectionDataModel {
         this.allItemsInSection = allItemsInSection;
     }
 
-
-
     public String getHeaderTitle() {
         return headerTitle;
     }

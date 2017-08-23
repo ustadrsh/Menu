@@ -2,7 +2,6 @@ package hk.ust.aed.menu;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -15,7 +14,6 @@ import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,11 +24,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private hk.ust.aed.menu.MenuMap menuMap;
     private String[] mColumnProjection = new String[]{
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity
     private String mOrderBy = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY;
     private int myLoader = 1;
 
+    private FirebaseStorage storage;
+    StorageReference storageRef;
+
     private List<Integer> coinPerformanceStringToList(String str) {
         List<Integer> result = new ArrayList<Integer>();
         int currInt = 1;
@@ -50,7 +54,6 @@ public class MainActivity extends AppCompatActivity
             int leng = Integer.parseInt(strArray[i]);
             for (int j = 0; j < leng; ++j) {
                 result.add(currInt);
-                //Log.d("TAG", "" + currInt);
             }
             if (currInt == 0) currInt = 1;
             else currInt = 0;
@@ -61,15 +64,24 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == Activity.RESULT_OK){
-            switch(requestCode){
-                case MenuMap.SWM:
-                    Log.e("SWM RETURNED", data.getStringExtra("result"));
+            MenuMap.Screen app = MenuMap.Screen.values()[requestCode];
+            switch(app){
+                case SWM_APP:
+                    String SWMresult = data.getStringExtra("result");
+                    Log.e("SWM RETURNED", SWMresult);
                     break;
-                case MenuMap.SRM:
+                case SRM_APP:
                     Log.e("SRM RETURNED", data.getStringExtra("result"));
                     break;
-                case MenuMap.UNITY_GAME:
+                case UNITY_GAME_APP:
                     Log.d("TAG", "OK");
+                    //DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                    //DatabaseReference ref = mDatabase.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "3dgame" + UploadFirebase.getLatestTrialId(MenuMap.Screen.UNITY_GAME_APP, true));
+                    //ref.setValue(jsonPath);
+                    //users/uid/3dgame/trial id
+                    //ref = mDatabase.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "3dgame/params");
+                    //Put this in users/uid/3dgame/params
+                    //ref.setValue(paramsPath);
                     String signDurationCalibrated = data.getStringExtra("signDurationCalibrated");
                     String roadSpeedCalibrated = data.getStringExtra("roadSpeedCalibrated");
                     String sensitivity = data.getStringExtra("sensitivity");
@@ -89,6 +101,7 @@ public class MainActivity extends AppCompatActivity
                     Log.d("TAG", sensitivity);
                     break;
             }
+            new UploadFirebase(this, app).execute();
         }
         if (resultCode == Activity.RESULT_CANCELED) {
             //Write your code if there's no result
@@ -99,6 +112,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        UploadFirebase.maybeProduceListeners();
+
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
         //Start UploadScheduler if there is no alarm of it
@@ -123,9 +139,6 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getLoaderManager().initLoader(myLoader, null, MainActivity.this);
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
 
@@ -136,24 +149,25 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        loadMenu(0);
+        menuMap.newScreen(MenuMap.Screen.NULL, 0);
         navigationView.getMenu().getItem(0).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
-    public void onBackPressed() { //TODO: FIX LOGIC!!!
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.e("menu", "BP");
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
-        FragmentManager fm = getFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) { //DOESNT WORK
-            Log.i("MainActivity", "popping backstack");
-            fm.popBackStack();
-        } else {
-            Log.i("MainActivity", "nothing on backstack, calling super");
-            super.onBackPressed();
+        else{
+            menuMap.backPressed();
         }
     }
 
@@ -169,13 +183,7 @@ public class MainActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
+        //noinspection SimplifiableIfStatement=
         return super.onOptionsItemSelected(item);
     }
 
@@ -185,35 +193,27 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         if (id == R.id.test) {
-            loadMenu(1);
+            menuMap.newScreen(MenuMap.Screen.INIT, 0);
         } else if (id == R.id.account) {
-            loadMenu(2);
-        } else if (id == R.id.settings) {
-            loadMenu(3);
+            menuMap.newScreen(MenuMap.Screen.INIT, 1);
+        } else if (id == R.id.scores) {
+            menuMap.newScreen(MenuMap.Screen.INIT, 2);
         } else if (id == R.id.send) {
 
         } else if (id == R.id.share) {
 
         } else if (id == R.id.logout) {
-
+            FirebaseAuth.getInstance().signOut();
+            while(getSupportFragmentManager().getBackStackEntryCount() > 0){
+                Log.e("frags", String.valueOf(getSupportFragmentManager().getBackStackEntryCount()));
+                getSupportFragmentManager().popBackStackImmediate();
+            }
+            startActivity(new Intent(MainActivity.this, Login.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    public void loadMenu(int desiredFragmentState){
-        /*Tests fragment = new Tests();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frame, fragment, "fragment1");
-        fragmentTransaction.commit();*/
-        menuMap.newScreen(0, desiredFragmentState);
-        /*MenuFragment menu = new MenuFragment();
-        Bundle args = new Bundle();
-        args.putInt("state", desiredFragmentState);
-        menu.setArguments(args);
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame, menu).commit();*/
     }
 
     public MenuMap getMenuMap(){
@@ -242,6 +242,5 @@ public class MainActivity extends AppCompatActivity
     public void onLoaderReset(Loader loader) {
 
     }
-
     //END LOADER
 }

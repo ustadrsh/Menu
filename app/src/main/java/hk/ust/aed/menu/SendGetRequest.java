@@ -1,20 +1,11 @@
 package hk.ust.aed.menu;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 /**
  * Created by Administrator on 18/07/2017.
  */
 
 public class SendGetRequest {
-    private Context context;
+    /*private Context context;
     private String url;
     private ParseRequest parseRequest;
     //private ImageView holder;
@@ -43,5 +34,5 @@ public class SendGetRequest {
                 });
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(stringRequest);
-    }
+    }*/
 }

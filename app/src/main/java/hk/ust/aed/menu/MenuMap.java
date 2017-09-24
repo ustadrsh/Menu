@@ -3,6 +3,8 @@ package hk.ust.aed.menu;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.util.Stack;
+
 import static hk.ust.aed.menu.MenuMap.Screen.ACCOUNT;
 import static hk.ust.aed.menu.MenuMap.Screen.CHANGE_CREDENTIALS;
 import static hk.ust.aed.menu.MenuMap.Screen.INIT;
@@ -35,6 +37,7 @@ import static hk.ust.aed.menu.MenuMap.Screen.USAGE_STATISTICS;
 class MenuMap {
 
     public MainActivity parent;
+    public Stack<Screen> screensStack = new Stack<>();
 
     public enum Screen {
         NULL,
@@ -48,20 +51,22 @@ class MenuMap {
 
     public Screen currentScreen;
 
-    /*public String[][] titles = {
-            {"Init", "Tests", "Account", "Settings",
-            "Passive Monitoring", "MTT", "SWM", "SRM", "3D Game"},
-            {"Scoreboard", "Usage statistics"},
-            {"Recalibrate game", "Change username or password", "Privacy settings"}
-    };*/
+    public String[] titles = {
+            "Null",
+            "Main menu",
+            "Tests", "Account", "Scores", "Settings",
+            "Scoreboard", "Usage Statistics", "Recalibrate", "Change Credentials", "Privacy",
+            "SRM Scores", "SWM Scores", "MTT Scores",
+            "Passive Monitoring", "Multitasking Test (MTT)", "Spatial Working Memory (SWM)", "Spatial Recognition Memory (SRM)", "3D Game",
+            "Run Monitoring!", "Run MTT!", "Run SWM!", "Run SRM!", "Run 3D Game!"
+    };
 
     public MenuMap(MainActivity parent){
         this.parent = parent;
     }
 
     public String getTitle(Screen state){
-        String title = state.name();
-        if(true) { //Todo: UPDATE
+        /*if(true) { //Todo: UPDATE
             title = title.replace("_", " ");
         }
         else{
@@ -75,8 +80,13 @@ class MenuMap {
                 }
             }
             title = new String(arr);
+        }*/
+        try{
+            return titles[state.ordinal()];
         }
-        return title;
+        catch(Exception e){
+            return "";
+        }
     }
 
     public Screen[] getLinks(Screen state){
@@ -103,6 +113,7 @@ class MenuMap {
 
     public void newScreen(Screen currentScreen, int selectedItemIndex){
         Bundle args = new Bundle();
+        screensStack.push(currentScreen);
         final Screen newScreen = getLinks(currentScreen)[selectedItemIndex];
         //parent.setTitle(getTitle(newScreen));
         args.putString("state", newScreen.name());
@@ -131,7 +142,6 @@ class MenuMap {
                     .addToBackStack(null)
                     .replace(R.id.frame, scoreboard)
                     .commit();
-            Log.e("Opening", "Score fragrenage");
         }
         else if( newScreen.ordinal() <= UNITY_GAME_INFO.ordinal() ){
             InfoFragment info = new InfoFragment();
@@ -157,6 +167,12 @@ class MenuMap {
         else{
             if (parent.getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 parent.getSupportFragmentManager().popBackStack();
+                if(!screensStack.empty()){
+                    String title = getTitle(screensStack.pop());
+                    if(title != "") {
+                        parent.setTitle(title);
+                    }
+                }
             }
         }
     }

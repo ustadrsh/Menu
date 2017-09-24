@@ -86,7 +86,10 @@ public class Scoreboard extends Fragment {
                     SimpleDateFormat sdf = new SimpleDateFormat("'Logged at' h:mm a 'on\n'MMMM d, yyyy");
                     child.title = sdf.format(scores.remove("unixTimeMillis"));
                 }
-                child.hint = printObjectWithTabs(scores, 0);
+                HashMap<String, Object> summary = new HashMap<>();
+                summary.put("Average Latencies", String.valueOf(scores.get("averageLatencyMillis")));
+                summary.put("Average Correctness", String.valueOf(scores.get("averageCorrectnessPercentage")) + "%");
+                child.hint = printObjectWithTabs(summary, 0);
 
                 item.items.add(child);
             }

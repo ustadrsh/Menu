@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -54,9 +53,8 @@ public class LoginRegisterDialog extends DialogFragment {
         parent = (Login) getActivity();
 
         builder.setView(mView)
-                .setPositiveButton(R.string.login_login, null)
+                .setPositiveButton(R.string.login_register, null)
                 .setNegativeButton(R.string.login_verify_cancel, null);
-
         this.setRetainInstance(true);
 
         mDialog = builder.create();
@@ -157,7 +155,6 @@ public class LoginRegisterDialog extends DialogFragment {
         mDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("Negative", "Attempt");
                 LoginRegisterDialog.this.getDialog().cancel();
             }
         });

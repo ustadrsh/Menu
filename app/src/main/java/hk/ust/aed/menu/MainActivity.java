@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        menuMap.screensStack.pop();
         if(resultCode == Activity.RESULT_OK){
             MenuMap.Screen app = MenuMap.Screen.values()[requestCode];
             switch(app){
